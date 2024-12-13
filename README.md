@@ -4,7 +4,8 @@ Atividade avaliativa da disciplina SEGURANÇA COMPUTACIONAL.
 
 - **O incidente é a quebra de uma cifra de campos STRING de tabelas PARADOX. Este incidente depende de uma ocorrência anterior para o atacante adquirir acesso às tabelas, i. e., ao banco de dados do sistema alvo;**
 - **Nota-se neste caso que não é difícil acessar esse banco de dados pois é baseado em arquivos. O mero acesso do atacante à uma máquina com a base replicada já compromete os dados;**
-- **Optou-se por não identificar a empresa alvo da simulação de ataque.**
+- **Optou-se por não identificar a empresa alvo da simulação de ataque;**
+- **A propriedade afetada é a confidencialidade por conta da exposição de dados sensíveis a entidades sem autorização prévia.**
 
 ## Análise do incidente
 
