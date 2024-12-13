@@ -2,9 +2,9 @@
 
 ## IDENTIFICAÇÃO
 
-**Nome:** Matheus M. Moro
-**Contato:** marchimm2003@gmail.com
-**Sistema/Aplicação:** sist. de folha de pagamento
+**Nome:** Matheus M. Moro<br>
+**Contato:** marchimm2003@gmail.com<br>
+**Sistema/Aplicação:** sist. de folha de pagamento<br>
 **Data/Hora:** 12/12/2024 20h
 
 ## RESUMO
