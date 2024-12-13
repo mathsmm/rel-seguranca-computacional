@@ -63,6 +63,8 @@ Após implementar um algoritmo que considera os caracteres com tamanho 7 nas seq
 
 O primeiro registro decifrado do campo bdENDERECO, utilizando o algoritmo final, é: Rudolfo Walter, endereço que condiz com o bdCEP analisado (EVIDÊNCIA).
 
+![](img/tabela-caracteres-identificados-endereco.png)
+
 Segue o algoritmo final:
 
 ```python

@@ -53,6 +53,7 @@ def uncrypt_ENDERECO(idx):
         ints_b.append(table_1[idx].bdENDERECO[i])
         i += 1
     bits_extras = len(table_1[idx].bdENDERECO) - 8
+    print(s)
     msg = ''
     byte_a = bytearray()
     ints_a = []
