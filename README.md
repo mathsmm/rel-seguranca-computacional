@@ -1,19 +1,29 @@
-# AV3 - Relatório de Incidente de Segurança
+# RELATÓRIO DE INCIDENTE DE SEGURANÇA DA INFORMAÇÃO
 
-Atividade avaliativa da disciplina SEGURANÇA COMPUTACIONAL.
+## IDENTIFICAÇÃO
 
-- **O incidente é a quebra de uma cifra de campos STRING de tabelas PARADOX. Este incidente depende de uma ocorrência anterior para o atacante adquirir acesso às tabelas, i. e., ao banco de dados do sistema alvo;**
-- **Nota-se neste caso que não é difícil acessar esse banco de dados pois é baseado em arquivos. O mero acesso do atacante à uma máquina com a base replicada já compromete os dados;**
-- **Optou-se por não identificar a empresa alvo da simulação de ataque;**
-- **A propriedade afetada é a confidencialidade por conta da exposição de dados sensíveis a entidades sem autorização prévia.**
+**Nome:** Matheus M. Moro
+**Contato:** marchimm2003@gmail.com
+**Sistema/Aplicação:** sist. de folha de pagamento
+**Data/Hora:** 12/12/2024 20h
 
-## Análise do incidente
+## RESUMO
+
+### Tipo de incidente
+Quebra de cifra - acesso a dados cifrados. Exposição de dados sensíveis a entidades não autorizadas (Confidencialidade).
+
+### Descrição do incidente
+O incidente é a quebra de uma cifra de campos STRING de tabelas PARADOX. Este incidente depende de uma ocorrência anterior para o atacante adquirir acesso às tabelas, i. e., ao banco de dados do sistema alvo. Nota-se neste caso que não é difícil acessar esse banco de dados pois é baseado em arquivos. O mero acesso do atacante à uma máquina com a base replicada já compromete os dados.
+
+## AÇÕES
 
 Os campos comprometidos são: bdCEP e bdENDERECO de uma tabela chamada TFUNCAUX.DB que foi preenchida com dados fictícios por um agente da empresa acometida. Estes campos são do tipo STRING com codificação cp1252.
 
 Utilizou-se o software Paradox Database Reader para visualizar a tabela em um primeiro momento.
 
 ![](img/campos.png)
+
+### Medidas de identificação
 
 Imediatamente nota-se que os campos cifrados começam com o caractere "ñ", mesmo com o restante do conteúdo variando. Supõe-se que este caractere simboliza que o registro está cifrado.
 
@@ -47,11 +57,11 @@ Após estas observações, tentou-se identificar todos os possíveis encaixes de
 
 ![](img/tabela-caracteres-identificados.png)
 
-A faixa verde representa um CEP válido que aponta para a Rua Rudolfo Walter, no bairro Itoupava Central. Uma célula foi pintada de vermelho pois há um bit que não se encaixa nesta faixa. Os outros possíveis símbolos estão pintados de azul e de rosa.
+A faixa verde representa um CEP válido que aponta para a Rua Rudolfo Walter, no bairro Itoupava Central (EVIDÊNCIA). Uma célula foi pintada de vermelho pois há um bit que não se encaixa nesta faixa. Os outros possíveis símbolos estão pintados de azul e de rosa.
 
 Após implementar um algoritmo que considera os caracteres com tamanho 7 nas sequências binárias, e que também despreza o primeiro byte e inverte toda a sequência, somente foi capaz de decifrar os campos bdENDERECO após adicionar uma lógica para ignorar bits como o que foi pintado de vermelho na última tabela. Em todos os bytes até chegar nos oito últimos, sempre há um bit extra na oitava posição de cada byte que é zero ou um. E que, ao ser desconsiderado, parece não alterar o resultado final.
 
-O primeiro registro decifrado do campo bdENDERECO, utilizando o algoritmo final, é: Rudolfo Walter, endereço que condiz com o bdCEP analisado.
+O primeiro registro decifrado do campo bdENDERECO, utilizando o algoritmo final, é: Rudolfo Walter, endereço que condiz com o bdCEP analisado (EVIDÊNCIA).
 
 Segue o algoritmo final:
 
@@ -96,3 +106,21 @@ def uncrypt_CEP(idx): # ou uncrypt_ENDERECO
     # print("DECIFRADO:", byte_a.decode(encoding="cp1252")) # opcional
     # print("DECIFRADO:", ints_a) # opcional
 ```
+
+### Medidas de mitigação
+
+Fatores limitantes que foram identificados:
+- Caractere "ñ" que muito provavelmente simboliza que o campo está cifrado;
+- Muito provavelmente uma exigência do algoritmo de cifragem e decifragem é que ele seja rápido pois são campos de leitura frequente. O algoritmo precisa estar embutido localmente na aplicação e não pode depender de internet.
+
+Medidas sugeridas para melhorar a cifragem:
+- Ao invés de utilizar um byte somente para identificar que o campo está cifrado, guardar esta informação em outro lugar, como em outra tabela;
+- Supõe-se que a cifra deve ser rápida, implementada localmente e com o intuito de preservar o comprimento do campo original. Sugere-se então utilizar uma Cifra de Vigenère modificada para:
+  - Utilizar a codificação dos caracteres ao invés dos símbolos;
+  - Manter a consideração de 7 bits para representação dos caracteres. Desta forma o oitavo bit, mais significativo, pode ser aleatório;
+  - Utilizar chave numérica ou um vetor de chaves numéricas para dificultar a localização da chave no executável do programa. Uma chave de símbolos seria mais facilmente localizada.
+
+## CONCLUSÃO
+Mesmo este incidente dependendo de um acesso não autorizado anterior para comprometer os dados cifrados da base de dados, é bem provável que a empresa não dê a devida importância para este relatório. Contudo, sabendo da natureza dos usuários do sistema e da fraqueza da cifra, é perfeitamente possível um atacante acessar bases de dados de seus usuários com técnicas de phishing/engenharia social e roubar as informações sensíveis cifradas dentre algumas horas, até quebrar a cifra.
+
+A sugestão de medida de mitigação aumentaria o tempo de quebra consideravelmente porque dependeria do atacante entender a cifra utilizada, entender suas modificações e ainda achar a chave no binário do executável do sistema.
